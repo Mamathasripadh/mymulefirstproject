@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="3fdfb596-ae69-4cfc-83e8-8d413218e139" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<flow name="choice-queryFlow1" doc:id="a926abe6-dc2a-44e5-adfc-055b3624a336" >
+		<http:listener doc:name="Listener" doc:id="a04858b7-942a-4a26-a2d5-3249a4906be0" config-ref="HTTP_Listener_config" path="api/getCustomer"/>
+		<logger level="INFO" doc:name="Logger" doc:id="11561d48-0b7c-4d94-a50d-82b9db20cf94" message="#[payload]"/>
+		<foreach doc:name="For Each" doc:id="28971fb5-59f9-4617-9802-90c516ddd949">
+			<choice doc:name="Choice" doc:id="ebf74621-af12-4a5c-94ab-b13da65c290f">
+			<when expression='#[sizeOf(payload)&gt;0]'>
+				<ee:transform doc:name="Transform Message" doc:id="ff63dcaf-71b8-4db0-8536-81bee6dac201">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"message": "the condition is satisfied the state is AP"
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</when>
+				<otherwise>
+				<ee:transform doc:name="Transform Message" doc:id="7c0dc67e-d35b-4e30-804e-857268255c4e">
+					<ee:message>
+						<ee:set-payload><![CDATA["not satisfied state "]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</otherwise>
+		
+</choice>
+		</foreach>
+	
+</flow>
+	</mule>
